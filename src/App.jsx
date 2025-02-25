@@ -14,7 +14,6 @@ const App = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [isHovered, setIsHovered] = useState(false);
 
   // Fetch Images 
   useEffect(() => {
@@ -147,34 +146,33 @@ const App = () => {
             >
               <div
                 className='relative'
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+
                 onClick={(e) => e.stopPropagation()}
               >
                 <img src={selectedImage} alt="Image" className="max-w-[90vw] max-h-[90vh] rounded-lg shadow-lg" />
 
-                {isHovered && (<button
+                <button
                   className='absolute top-4 right-4 text-red-700 bg-black w-10 h-10 flex items-center justify-center rounded-full text-2xl cursor-pointer hover:text-red-500 transition duration-300'
-                  onClick={closeModal}><IoClose /></button>)}
+                  onClick={closeModal}><IoClose /></button>
 
-                {
-                  isHovered && (<div className='flex items-center justify-center gap-4 absolute bottom-4 right-4'>
-                    <button
-                      onClick={() => downloadImage(selectedImage)}
-                      className=' text-red-700 bg-black w-10 h-10 flex items-center justify-center rounded-full text-lg cursor-pointer hover:text-red-500 transition duration-300'>
-                      <FaDownload />
-                    </button>
 
-                    {/* import { FaShareSquare } from "react-icons/fa"; */}
-                    {/* <button
+                <div className='flex items-center justify-center gap-4 absolute bottom-4 right-4'>
+                  <button
+                    onClick={() => downloadImage(selectedImage)}
+                    className=' text-red-700 bg-black w-10 h-10 flex items-center justify-center rounded-full text-lg cursor-pointer hover:text-red-500 transition duration-300'>
+                    <FaDownload />
+                  </button>
+
+                  {/* import { FaShareSquare } from "react-icons/fa"; */}
+                  {/* <button
                        onClick={() => {
                         navigator.clipboard.writeText(selectedImage);}}
                       className=' text-red-700 bg-black w-10 h-10 flex items-center justify-center rounded-full text-lg cursor-pointer hover:text-red-500 transition duration-300'>
                       <FaShareSquare />
                     </button> */}
 
-                  </div>)
-                }
+                </div>
+
 
               </div>
 
