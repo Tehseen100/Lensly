@@ -51,25 +51,61 @@ const App = () => {
   // Filter Images Btns 
   const categories = ["All", "Wallpaper", "Cars", "Cats"];
 
-  // Close Modal Function 
+  // Open Modal & Update Browser History
+  const openModal = (image) => {
+    setSelectedImage(image);
+    window.history.pushState({ modalOpen: true }, ""); // Add history entry
+  };
+
+  // Close Modal & Handle Back Button
   const closeModal = () => {
     setSelectedImage(null);
-  }
+    window.history.back(); // Remove history entry
+  };
+
+  useEffect(() => {
+    const handleBack = () => {
+      setSelectedImage(null);
+    };
+
+    window.addEventListener("popstate", handleBack);
+    return () => {
+      window.removeEventListener("popstate", handleBack);
+    };
+  }, []);
 
   // Download Function 
-  const downloadImage = async (imageUrl) => {
-    const response = await fetch(imageUrl);
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'download-image.jpeg';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+  const downloadImage = async (imageUrl, imageName) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
 
-  }
+      // Extract file extension from URL (default to jpg)
+      const fileExtension = imageUrl.split('.').pop().split('?')[0] || "jpg";
+
+      // Final filename (use image name if available, else generate a unique name)
+      const finalFileName = imageName
+        ? `${imageName.replace(/\s+/g, "_")}.${fileExtension}`
+        : `unsplash_image_${new Date().getTime()}.${fileExtension}`;
+
+      // Create a temporary <a> tag for download
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = finalFileName;
+
+      document.body.appendChild(a);
+      a.click();
+
+      // Cleanup
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
+  };
+
+
 
   return (
     <div className='bg-[#021526] text-white w-full  min-h-screen'>
@@ -126,7 +162,7 @@ const App = () => {
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 px-2 py-4">
             {images.map((image) => (
-              <div key={image.id} onClick={() => setSelectedImage(image.urls.regular)} className="relative h-[300px] overflow-hidden rounded-lg shadow-md">
+              <div key={image.id} onClick={() => openModal(image)} className="relative h-[300px] overflow-hidden rounded-lg shadow-md">
                 <img
                   src={image.urls.small}
                   alt={image.alt_description || "Image"}
@@ -149,7 +185,7 @@ const App = () => {
 
                 onClick={(e) => e.stopPropagation()}
               >
-                <img src={selectedImage} alt="Image" className="max-w-[90vw] max-h-[90vh] rounded-lg shadow-lg" />
+                <img src={selectedImage.urls.regular} alt={selectedImage.alt_description || "Image"} className="max-w-[90vw] max-h-[90vh] rounded-lg shadow-lg" />
 
                 <button
                   className='absolute top-4 right-4 text-red-700 bg-black w-10 h-10 flex items-center justify-center rounded-full text-2xl cursor-pointer hover:text-red-500 transition duration-300'
@@ -158,18 +194,11 @@ const App = () => {
 
                 <div className='flex items-center justify-center gap-4 absolute bottom-4 right-4'>
                   <button
-                    onClick={() => downloadImage(selectedImage)}
+                    onClick={() => downloadImage(selectedImage.urls.full, selectedImage.alt_description)}
                     className=' text-red-700 bg-black w-10 h-10 flex items-center justify-center rounded-full text-lg cursor-pointer hover:text-red-500 transition duration-300'>
                     <FaDownload />
                   </button>
 
-                  {/* import { FaShareSquare } from "react-icons/fa"; */}
-                  {/* <button
-                       onClick={() => {
-                        navigator.clipboard.writeText(selectedImage);}}
-                      className=' text-red-700 bg-black w-10 h-10 flex items-center justify-center rounded-full text-lg cursor-pointer hover:text-red-500 transition duration-300'>
-                      <FaShareSquare />
-                    </button> */}
 
                 </div>
 
