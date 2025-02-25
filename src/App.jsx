@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Logo from './components/logo'
 import { IoSearchOutline } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import { FaDownload } from "react-icons/fa";
@@ -77,7 +76,9 @@ const App = () => {
     <div className='bg-[#021526] text-white w-full  min-h-screen'>
 
       {/* Logo  */}
-      <Logo />
+      <div className='w-full flex items-center justify-center p-5'>
+        <h1 className='text-4xl'>Lensly</h1>
+      </div>
 
       {/* Search & Filter  */}
       <div id="searchbar" className='flex flex-col gap-4 items-center justify-center'>
