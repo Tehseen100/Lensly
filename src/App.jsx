@@ -14,6 +14,7 @@ const App = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false); // Loader for Modal
 
   // Fetch Images 
   useEffect(() => {
@@ -54,6 +55,7 @@ const App = () => {
   // Open Modal & Update Browser History
   const openModal = (image) => {
     setSelectedImage(image);
+    setModalLoading(true);
     window.history.pushState({ modalOpen: true }, ""); // Add history entry
   };
 
@@ -104,8 +106,6 @@ const App = () => {
       console.error("Download failed:", error);
     }
   };
-
-
 
   return (
     <div className='bg-[#021526] text-white w-full  min-h-screen'>
@@ -182,27 +182,34 @@ const App = () => {
             >
               <div
                 className='relative'
-
                 onClick={(e) => e.stopPropagation()}
               >
-                <img src={selectedImage.urls.regular} alt={selectedImage.alt_description || "Image"} className="max-w-[90vw] max-h-[90vh] rounded-lg shadow-lg" />
+                {modalLoading && (
+                  <div className="flex justify-center items-center absolute inset-0 bg-black bg-opacity-40">
+                    <div className="animate-spin rounded-full h-10 w-10 border-4 border-red-700 border-t-transparent"></div>
+                  </div>
+                )}
+                <img
+                  src={selectedImage.urls.regular}
+                  alt={selectedImage.alt_description || "Image"}
+                  className="max-w-[90vw] max-h-[90vh] rounded-lg shadow-lg"
+                  onLoad={() => setModalLoading(false)} // Hide loader when image loads
+                />
 
-                <button
-                  className='absolute top-4 right-4 text-red-700 bg-black w-10 h-10 flex items-center justify-center rounded-full text-2xl cursor-pointer hover:text-red-500 transition duration-300'
-                  onClick={closeModal}><IoClose /></button>
-
-
-                <div className='flex items-center justify-center gap-4 absolute bottom-4 right-4'>
+                {!modalLoading && (<>
                   <button
-                    onClick={() => downloadImage(selectedImage.urls.full, selectedImage.alt_description)}
-                    className=' text-red-700 bg-black w-10 h-10 flex items-center justify-center rounded-full text-lg cursor-pointer hover:text-red-500 transition duration-300'>
-                    <FaDownload />
+                    className='absolute top-4 right-4 text-red-700 bg-black w-10 h-10 flex items-center justify-center rounded-full text-2xl cursor-pointer hover:text-red-500 transition duration-300'
+                    onClick={closeModal}><IoClose />
                   </button>
 
-
-                </div>
-
-
+                  <div className='flex items-center justify-center gap-4 absolute bottom-4 right-4'>
+                    <button
+                      onClick={() => downloadImage(selectedImage.urls.full, selectedImage.alt_description)}
+                      className=' text-red-700 bg-black w-10 h-10 flex items-center justify-center rounded-full text-lg cursor-pointer hover:text-red-500 transition duration-300'>
+                      <FaDownload />
+                    </button>
+                  </div>
+                </>)}
               </div>
 
             </div>
